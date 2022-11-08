@@ -2,9 +2,15 @@ SHOW TRIGGERS IN assetmgt;
 
 -- DROP TRIGGER assetmgt.AFTER_ALLOCATING_NEW_ASSET;
 
-DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
+-- DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
 
-DROP TRIGGER assetmgt.BEFORE_DELETE_EMP;
+DROP TRIGGER assetmgt.AFTER_DELETE_EMP;
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- to disable them
+
+-- SET FOREIGN_KEY_CHECKS=1; -- to re-enable them
 
 --------create table for tracking the transaction of assets
 
@@ -49,27 +55,62 @@ ON ASSETALLOCATION
 	    end_date_value = now(),
 	    status = 'surplus'
 	WHERE asset_id = old.assetId;
+	UPDATE assets
+	SET assets.status = 'surplus'
+	WHERE assetId = old.assetId;
 END; 
 
+CREATE TRIGGER AFTER_DELETE_EMP AFTER DELETE ON EMPLOYEES 
+FOR EACH ROW BEGIN 
+	DELETE FROM assetallocation where empId = old.empId;
+END; 
 
+DELETE from employees WHERE empId='E112';
 
--- INSERT INTO
---     employees(
---         `empId`,
---         name,
---         email,
---         phone,
---         password,
---         location,
---         `jobTitle`
---     )
--- VALUES (
---         'E112',
---         'Suraj Mahamuni',
---         'suraj.mahamuni@torinit.ca',
---         9374562283,
---         '123',
---         'Pune',
---         'Software Engineer'
---     );
+INSERT INTO
+    employees(
+        `empId`,
+        name,
+        email,
+        phone,
+        password,
+        location,
+        `jobTitle`
+    )
+VALUES (
+        'E112',
+        'Suraj Mahamuni',
+        'suraj.mahamuni@torinit.ca',
+        9374562283,
+        '123',
+        'Pune',
+        'Software Engineer'
+    );
 
+INSERT INTO
+    assetallocation(
+        `assetallocationId`,
+        `empId`,
+        `assetId`,
+        `allocationTime`
+    )
+VALUES (
+        6,
+        'E112',
+        109,
+        '2022-11-08 18:00:17'
+    );
+
+INSERT INTO
+    assetallocation(
+        `assetallocationId`,
+        `empId`,
+        `assetId`,
+        `allocationTime`
+    )
+VALUES (
+        7,
+        'E112',
+        112,
+        '2022-11-08 18:00:17'
+    );
