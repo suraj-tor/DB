@@ -1,3 +1,11 @@
+SHOW TRIGGERS IN assetmgt;
+
+-- DROP TRIGGER assetmgt.AFTER_ALLOCATING_NEW_ASSET;
+
+DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
+
+DROP TRIGGER assetmgt.BEFORE_DELETE_EMP;
+
 --------create table for tracking the transaction of assets
 
 CREATE TABLE
@@ -35,48 +43,33 @@ END;
 
 CREATE TRIGGER AFTER_DEALLOCATING_ASSET AFTER DELETE 
 ON ASSETALLOCATION 
-	BEGIN
+	FOR EACH ROW BEGIN
 	UPDATE transaction_history
 	SET
 	    end_date_value = now(),
-	    status = "available"
-	WHERE txn_id = txn_id;
+	    status = 'surplus'
+	WHERE asset_id = old.assetId;
 END; 
 
-SHOW TRIGGERS IN assetmgt;
 
--- DROP TRIGGER assetmgt.AFTER_ALLOCATING_NEW_ASSET;
 
-DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
+-- INSERT INTO
+--     employees(
+--         `empId`,
+--         name,
+--         email,
+--         phone,
+--         password,
+--         location,
+--         `jobTitle`
+--     )
+-- VALUES (
+--         'E112',
+--         'Suraj Mahamuni',
+--         'suraj.mahamuni@torinit.ca',
+--         9374562283,
+--         '123',
+--         'Pune',
+--         'Software Engineer'
+--     );
 
--- DROP TRIGGER assetmgt.AFTER_DELETE_EMP;
-
-CREATE TRIGGER BEFORE_DELETE_EMP BEFORE DELETE ON EMPLOYEES 
-FOR EACH ROW BEGIN 
-	DELETE FROM assetallocation WHERE empId = old.empId;
-END; 
-
-CREATE TRIGGER BEFORE_DELETE_EMP_UPDATE_ASSET BEFORE 
-DELETE ON EMPLOYEES FOR EACH ROW BEGIN 
-	UPDATE assets SET status = "surplus" WHERE assetId = assetId;
-END; 
-
-INSERT INTO
-    employees(
-        `empId`,
-        name,
-        email,
-        phone,
-        password,
-        location,
-        `jobTitle`
-    )
-VALUES (
-        'E112',
-        'Suraj Mahamuni',
-        'suraj.mahamuni@torinit.ca',
-        9374562283,
-        '123',
-        'Pune',
-        'Software Engineer'
-    );
