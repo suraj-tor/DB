@@ -1,11 +1,5 @@
 SHOW TRIGGERS IN assetmgt;
 
--- DROP TRIGGER assetmgt.AFTER_ALLOCATING_NEW_ASSET;
-
--- DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
-
-DROP TRIGGER assetmgt.AFTER_DELETE_EMP;
-
 SET FOREIGN_KEY_CHECKS=0;
 
 -- to disable them
@@ -16,16 +10,22 @@ SET FOREIGN_KEY_CHECKS=0;
 
 CREATE TABLE
     transaction_history (
-        txn_id int not null AUTO_INCREMENT,
+        transaction_id int not null AUTO_INCREMENT,
         asset_id int not null,
         emp_id VARCHAR(100) not null,
-        start_date_value DATETIME not null,
-        end_date_value DATETIME,
+        emp_name VARCHAR(100) not null,
+        allocation_date DATETIME not null,
+        deallocation_date DATETIME,
         status VARCHAR(255) not null,
-        PRIMARY KEY(txn_id),
+        ticket_generated int not null DEFAULT 0,
+        ticket_resolved int not null DEFAULT 0,
+        asset_updation VARCHAR(255) DEFAULT NULL,
+        PRIMARY KEY(transaction_id),
         Foreign Key (asset_id) REFERENCES assets(assetId),
         Foreign Key (emp_id) REFERENCES employees(empId)
     );
+
+-- DROP TRIGGER assetmgt.AFTER_ALLOCATING_NEW_ASSET;
 
 CREATE TRIGGER AFTER_ALLOCATING_NEW_ASSET AFTER INSERT 
 ON ASSETALLOCATION 
@@ -34,25 +34,49 @@ ON ASSETALLOCATION
 	    transaction_history (
 	        asset_id,
 	        emp_id,
-	        start_date_value,
-	        end_date_value,
-	        status
+	        emp_name,
+	        allocation_date,
+	        deallocation_date,
+	        status,
+	        ticket_generated,
+	        ticket_resolved,
 	    )
 	VALUES (
 	        new.assetId,
-	        new.empId,
+	        new.empId, (
+	            SELECT name
+	            from employees
+	            where
+	                empId = new.empId
+	        ),
 	        now(),
 	        null,
-	        "allocated"
+	        'allocated', (
+	            SELECT
+	                count(empId)
+	            from tickets
+	            where
+	                assetId = new.assetId
+	                AND ticketStatus = 'active'
+	        ), (
+	            SELECT
+	                count(empId)
+	            from tickets
+	            where
+	                assetId = new.assetId
+	                AND ticketStatus = 'closed'
+	        )
 	    );
 END; 
+
+DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
 
 CREATE TRIGGER AFTER_DEALLOCATING_ASSET AFTER DELETE 
 ON ASSETALLOCATION 
 	FOR EACH ROW BEGIN
 	UPDATE transaction_history
 	SET
-	    end_date_value = now(),
+	    deallocation_date = now(),
 	    status = 'surplus'
 	WHERE asset_id = old.assetId;
 	UPDATE assets
@@ -60,9 +84,15 @@ ON ASSETALLOCATION
 	WHERE assetId = old.assetId;
 END; 
 
-CREATE TRIGGER AFTER_DELETE_EMP AFTER DELETE ON EMPLOYEES 
+-- DROP TRIGGER assetmgt.AFTER_DELETE_EMP;
+
+CREATE TRIGGER AFTER_UPDATE_EMP AFTER UPDATE ON EMPLOYEES 
 FOR EACH ROW BEGIN 
-	DELETE FROM assetallocation where empId = old.empId;
+	IF new.is_active <> old.is_active THEN
+	DELETE FROM
+	    assetallocation
+	where empId = old.empId;
+	END IF;
 END; 
 
 DELETE from employees WHERE empId='E112';
