@@ -12,14 +12,17 @@ CREATE TABLE
     transaction_history (
         transaction_id int not null AUTO_INCREMENT,
         asset_id int not null,
+        received_date DATETIME NOT NULL,
         emp_id VARCHAR(100) not null,
         emp_name VARCHAR(100) not null,
         allocation_date DATETIME not null,
-        deallocation_date DATETIME,
+        deallocation_date DATETIME DEFAULT NULL,
         status VARCHAR(255) not null,
-        ticket_generated int not null DEFAULT 0,
-        ticket_resolved int not null DEFAULT 0,
+        ticket_id int DEFAULT NULL,
+        ticket_generated_date DATETIME DEFAULT NULL,
+        ticket_resolved_date DATETIME DEFAULT NULL,
         asset_updation VARCHAR(255) DEFAULT NULL,
+        asset_delete VARCHAR(100) DEFAULT 0,
         PRIMARY KEY(transaction_id),
         Foreign Key (asset_id) REFERENCES assets(assetId),
         Foreign Key (emp_id) REFERENCES employees(empId)
@@ -33,16 +36,20 @@ ON ASSETALLOCATION
 	INSERT into
 	    transaction_history (
 	        asset_id,
+	        received_date,
 	        emp_id,
 	        emp_name,
 	        allocation_date,
-	        deallocation_date,
-	        status,
-	        ticket_generated,
-	        ticket_resolved,
+	        status
 	    )
 	VALUES (
-	        new.assetId,
+	        new.assetId, (
+	            SELECT
+	                received_date
+	            FROM assets
+	            WHERE
+	                assetId = new.assetId
+	        ),
 	        new.empId, (
 	            SELECT name
 	            from employees
@@ -50,26 +57,11 @@ ON ASSETALLOCATION
 	                empId = new.empId
 	        ),
 	        now(),
-	        null,
-	        'allocated', (
-	            SELECT
-	                count(empId)
-	            from tickets
-	            where
-	                assetId = new.assetId
-	                AND ticketStatus = 'active'
-	        ), (
-	            SELECT
-	                count(empId)
-	            from tickets
-	            where
-	                assetId = new.assetId
-	                AND ticketStatus = 'closed'
-	        )
+	        'allocated'
 	    );
 END; 
 
-DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
+-- DROP TRIGGER assetmgt.AFTER_DEALLOCATING_ASSET;
 
 CREATE TRIGGER AFTER_DEALLOCATING_ASSET AFTER DELETE 
 ON ASSETALLOCATION 
@@ -84,18 +76,16 @@ ON ASSETALLOCATION
 	WHERE assetId = old.assetId;
 END; 
 
--- DROP TRIGGER assetmgt.AFTER_DELETE_EMP;
+-- DROP TRIGGER assetmgt.AFTER_DELETE_ASSET;
 
-CREATE TRIGGER AFTER_UPDATE_EMP AFTER UPDATE ON EMPLOYEES 
-FOR EACH ROW BEGIN 
-	IF new.is_active <> old.is_active THEN
-	DELETE FROM
-	    assetallocation
-	where empId = old.empId;
+CREATE TRIGGER AFTER_DELETE_ASSET AFTER UPDATE ON ASSETS 
+	FOR EACH ROW BEGIN IF new.is_active <> old.is_active THEN
+	UPDATE transaction_history
+	SET asset_delete = 1
+	WHERE
+	    asset_id = old.assetId;
 	END IF;
 END; 
-
-DELETE from employees WHERE empId='E112';
 
 INSERT INTO
     employees(
