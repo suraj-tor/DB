@@ -54,4 +54,4 @@ UPDATE
 SET
     `ticketStatus` = 'closed'
 WHERE
-    `ticketId` = 33;
+    `ticketId` = 32;

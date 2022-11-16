@@ -10,21 +10,23 @@ CREATE TABLE transaction_history (
     transaction_id int not null AUTO_INCREMENT,
     asset_id int not null,
     received_date DATETIME NOT NULL,
-    emp_id VARCHAR(100) not null,
-    emp_name VARCHAR(100) not null,
-    allocation_date DATETIME not null,
+    emp_id VARCHAR(100) DEFAULT '-',
+    emp_name VARCHAR(100) DEFAULT '-',
+    allocation_date DATETIME DEFAULT NULL,
     deallocation_date DATETIME DEFAULT NULL,
-    status VARCHAR(255) not null,
+    status VARCHAR(100) not null,
     PRIMARY KEY(transaction_id),
     Foreign Key (asset_id) REFERENCES assets(assetId),
     Foreign Key (emp_id) REFERENCES employees(empId)
 );
 
+DROP TABLE IF EXISTS `asset_update`;
+
 CREATE TABLE asset_update (
     asset_update_id int not null AUTO_INCREMENT,
     asset_id int not null,
-    updated_feature VARCHAR(255) DEFAULT NULL,
-    description VARCHAR(255) NOT NULL DEFAULT '-',
+    updated_feature VARCHAR(100) DEFAULT NULL,
+    description VARCHAR(100) NOT NULL,
     effective_date DATETIME NOT NULL,
     PRIMARY KEY(asset_update_id),
     Foreign Key (asset_id) REFERENCES assets(assetId)
@@ -82,6 +84,8 @@ SET
 WHERE
     asset_id = old.assetId;
 
+END;
+
 UPDATE
     assets
 SET
@@ -89,10 +93,7 @@ SET
 WHERE
     assetId = old.assetId;
 
-END;
-
 -- DROP TRIGGER assetmgt.AFTER_ASSET_UPDATE;
-
 CREATE TRIGGER AFTER_ASSET_UPDATE
 AFTER
 UPDATE
@@ -184,61 +185,11 @@ VALUES
         (
             concat(
                 'from ',
-                old.HDD,
+                old.HDD,'gb',
                 ' to ',
-                new.HDD
+                new.HDD,'gb'
             )
         ),
-        now()
-    );
-
-ELSEIF (old.HDD IS NULL) THEN
-INSERT INTO
-    asset_update (
-        asset_id,
-        updated_feature,
-        description,
-        effective_date
-    )
-VALUES
-    (
-        new.assetId,
-        (
-            SELECT
-                COLUMN_NAME
-            FROM
-                INFORMATION_SCHEMA.COLUMNS
-            WHERE
-                TABLE_SCHEMA = 'assetmgt'
-                AND TABLE_NAME = 'assets'
-                AND COLUMN_NAME = 'HDD'
-        ),
-        (concat('Added new ', new.HDD)),
-        now()
-    );
-
-ELSEIF (new.HDD IS NULL) THEN
-INSERT INTO
-    asset_update (
-        asset_id,
-        updated_feature,
-        description,
-        effective_date
-    )
-VALUES
-    (
-        new.assetId,
-        (
-            SELECT
-                COLUMN_NAME
-            FROM
-                INFORMATION_SCHEMA.COLUMNS
-            WHERE
-                TABLE_SCHEMA = 'assetmgt'
-                AND TABLE_NAME = 'assets'
-                AND COLUMN_NAME = 'HDD'
-        ),
-        (concat('Removed ', old.HDD)),
         now()
     );
 
@@ -266,61 +217,11 @@ VALUES
         (
             concat(
                 'from ',
-                old.SSD,
+                old.SSD,'gb',
                 ' to ',
-                new.SSD
+                new.SSD,'gb'
             )
         ),
-        now()
-    );
-
-ELSEIF (old.SSD IS NULL) THEN
-INSERT INTO
-    asset_update (
-        asset_id,
-        updated_feature,
-        description,
-        effective_date
-    )
-VALUES
-    (
-        new.assetId,
-        (
-            SELECT
-                COLUMN_NAME
-            FROM
-                INFORMATION_SCHEMA.COLUMNS
-            WHERE
-                TABLE_SCHEMA = 'assetmgt'
-                AND TABLE_NAME = 'assets'
-                AND COLUMN_NAME = 'SSD'
-        ),
-        (concat('Added new ', new.SSD)),
-        now()
-    );
-
-ELSEIF (new.SSD IS NULL) THEN
-INSERT INTO
-    asset_update (
-        asset_id,
-        updated_feature,
-        description,
-        effective_date
-    )
-VALUES
-    (
-        new.assetId,
-        (
-            SELECT
-                COLUMN_NAME
-            FROM
-                INFORMATION_SCHEMA.COLUMNS
-            WHERE
-                TABLE_SCHEMA = 'assetmgt'
-                AND TABLE_NAME = 'assets'
-                AND COLUMN_NAME = 'SSD'
-        ),
-        (concat('Removed ', old.SSD)),
         now()
     );
 
@@ -328,8 +229,7 @@ END IF;
 
 END;
 
-DROP TRIGGER assetmgt.BEFORE_CLOSING_TICKET;
-
+-- DROP TRIGGER assetmgt.BEFORE_CLOSING_TICKET;
 CREATE TRIGGER BEFORE_CLOSING_TICKET BEFORE
 UPDATE
     ON tickets FOR EACH ROW BEGIN IF (new.ticketStatus = 'closed') THEN
@@ -339,3 +239,21 @@ SET
 END IF;
 
 END;
+
+DROP TRIGGER assetmgt.BEFORE_DELETING_ASSET;
+
+CREATE TRIGGER BEFORE_DELETING_ASSET BEFORE
+UPDATE
+    ON assets FOR EACH ROW BEGIN IF (new.is_active = 0) THEN
+SET
+    new.deleted_at = now();
+END IF;
+
+END;
+
+UPDATE
+    assets
+SET
+    is_active = 0
+WHERE
+    assetId = 112;
