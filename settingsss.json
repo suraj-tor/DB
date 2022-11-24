@@ -1,0 +1,96 @@
+{
+    "editor.fontSize": 15,
+    "editor.tabSize": 2,
+    "extensions.autoUpdate": false,
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#1f6fd0",
+        "activityBar.background": "#1f6fd0",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#ee90bb",
+        "activityBarBadge.foreground": "#15202b",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#1f6fd0",
+        "statusBar.background": "#1857a4",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#1f6fd0",
+        "statusBarItem.remoteBackground": "#1857a4",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "tab.activeBorder": "#1f6fd0",
+        "titleBar.activeBackground": "#1857a4",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#1857a499",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "workbench.tree.indent": 12,
+    "database-client.showTrigger": true,
+    "editor.minimap.maxColumn": 70,
+    "workbench.startupEditor": "none",
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact"
+    },
+    "prettier.printWidth": 250,
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "files.associations": {
+        "*.js": "javascriptreact",
+        "*.css": "css",
+        "*.ts": "typescriptreact",
+        "*.sql": "sql"
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "prettier.useEditorConfig": false,
+    "emmet.triggerExpansionOnTab": true,
+    "[css]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "emmet.syntaxProfiles": {
+        "javascript": "jsx"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "git.autofetch": true,
+    "editor.tokenColorCustomizations": {
+        "comments": "#857052"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "html.format.indentInnerHtml": true,
+    "git.ignoreRebaseWarning": true,
+    "gitlens.gitCommands.skipConfirmations": [
+        "fetch:command",
+        "stash-push:command",
+        "switch:command",
+        "push:command"
+    ],
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.suggest.shareSuggestSelections": true,
+    "prettier.trailingComma": "all",
+    "editor.stickyScroll.enabled": true,
+    "thunder-client.indentSize": 4,
+    "database-client.showFilter": true,
+    "database-client.saveConnectionExpandedState": true,
+    "database-client.executeCursorSQLByShortcut": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "[python]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.rulers":[{
+            "column": 150
+        }]
+    },
+    "tabnine.experimentalAutoImports": true,
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "editor.codeLens": false
+}

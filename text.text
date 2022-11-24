@@ -1,0 +1,25 @@
+Log Table
+log_id(not null), event_name(not null), asset_id(not null), emp_id(null), emp_name(null), update_id(null), ticket_id(null), asset_status(not null), update_feature(null), update_description(null), date(not null)
+
+1)asset receive => (event) - ok
+case1 - bulk receive
+case2 - add + allocate + bulk
+log_id(auto), event_name, asset_id, asset_status, emp_id(default null), emp_name(default null), date(now())
+
+2) asset allocated -ok 
+log_id(auto), event_name, asset_id, asset_status, emp_id(default null), emp_name(default null), date(now())
+
+3) ticket raised -ok
+log_id(auto), event_name, asset_id, emp_id, ticket_id, date
+
+4) ticket closed -ok
+log_id(auto), event_name, asset_id, emp_id, ticket_id, date
+
+5) asset update -ok
+log_id(auto), event_name, asset_id, update_id, update_feature, update_description, date
+
+6) asset Deallocated -ok 
+log_id(auto), event_name, asset_id, asset_status, emp_id(default null), emp_name(default null), date(now())
+
+7) asset delete -ok
+log_id(auto), event_name, asset_id, asset_status, date(now())

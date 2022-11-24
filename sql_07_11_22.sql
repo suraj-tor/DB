@@ -20,17 +20,17 @@ CREATE TABLE transaction_history (
     Foreign Key (emp_id) REFERENCES employees(empId)
 );
 
-DROP TABLE IF EXISTS `asset_update`;
+-- DROP TABLE IF EXISTS `asset_update`;
 
-CREATE TABLE asset_update (
-    asset_update_id int not null AUTO_INCREMENT,
-    asset_id int not null,
-    updated_feature VARCHAR(100) DEFAULT NULL,
-    description VARCHAR(100) NOT NULL,
-    effective_date DATETIME NOT NULL,
-    PRIMARY KEY(asset_update_id),
-    Foreign Key (asset_id) REFERENCES assets(assetId)
-);
+-- CREATE TABLE asset_update (
+--     asset_update_id int not null AUTO_INCREMENT,
+--     asset_id int not null,
+--     updated_feature VARCHAR(100) DEFAULT NULL,
+--     description VARCHAR(100) NOT NULL,
+--     effective_date DATETIME NOT NULL,
+--     PRIMARY KEY(asset_update_id),
+--     Foreign Key (asset_id) REFERENCES assets(assetId)
+-- );
 
 -- DROP TRIGGER assetmgt.AFTER_ALLOCATING_NEW_ASSET;
 CREATE TRIGGER AFTER_ALLOCATING_NEW_ASSET
@@ -38,7 +38,7 @@ AFTER
 INSERT
     ON ASSETALLOCATION for each row BEGIN
 INSERT into
-    transaction_history (
+    transaction_log (
         asset_id,
         received_date,
         emp_id,
